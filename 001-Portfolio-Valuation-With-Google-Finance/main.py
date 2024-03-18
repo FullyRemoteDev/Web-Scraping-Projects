@@ -9,19 +9,32 @@ import requests
 from bs4 import BeautifulSoup
 
 
-base_url = 'https://www.google.com/finance/quote/'
+def extract_stock_price(headers, base_url, stock_ticker, stock_exchange):
+    url = base_url + stock_ticker + ':' + stock_exchange
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, 'lxml')
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+    price_div = soup.find('div', {'data-last-price': True})
+    price = float(price_div['data-last-price'])
+    currency = price_div['data-currency-code']
 
-stock_ticker = 'TSLA'
-stock_exchange = 'NASDAQ'
+    return {
+        'Ticker': stock_ticker,
+        'Exchange': stock_exchange,
+        'Price': price,
+        'Currency': currency
+    }
 
-url = base_url + stock_ticker + ':' + stock_exchange
-response = requests.get(url)
 
-print(response.status_code)
+def main():
+    base_url = "https://www.google.com/finance/quote/"
 
-soup = BeautifulSoup(response.text, 'lxml')
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+    }
 
-print(soup.prettify())
+    print(extract_stock_price(headers, base_url,"TSLA", "NASDAQ"))
+
+
+if __name__ == "__main__":
+    main()
