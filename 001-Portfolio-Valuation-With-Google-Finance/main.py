@@ -7,11 +7,48 @@
 
 import requests
 from bs4 import BeautifulSoup
+from dataclasses import dataclass
 
 
-def convert_to_usd(headers, base_url, currency):
+@dataclass
+class Stock:
+    ticker: str
+    exchange: str
+    price: float = 0
+    currency: str = "USD"
+    price_in_usd: float = 0
+
+    def __post_init__(self):
+        price_info = extract_stock_info(self.ticker, self.exchange)
+
+        if price_info["ticker"] == self.ticker:
+            self.price = price_info["price"]
+            self.currency = price_info["currency"]
+            self.price_in_usd = price_info["price_in_usd"]
+
+
+@dataclass
+class Position:
+    stock: Stock
+    quantity: int
+
+
+@dataclass
+class Portfolio:
+    positions: list[Position]
+
+    def portfolio_value(self):
+        total_value = 0
+        for position in self.positions:
+            total_value += position.stock.price_in_usd * position.quantity
+        return total_value
+
+
+
+def convert_to_usd(currency):
+    base_url = "https://www.google.com/finance/quote/"
     url = f"{base_url}{currency}-USD"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url)
     soup = BeautifulSoup(response.content, "lxml")
 
     exchange_rate_div = soup.find("div", attrs={"data-last-price": True})
@@ -20,9 +57,10 @@ def convert_to_usd(headers, base_url, currency):
     return exchange_rate
 
 
-def extract_stock_info(headers, base_url, stock_ticker, stock_exchange):
-    url = base_url + stock_ticker + ":" + stock_exchange
-    response = requests.get(url, headers=headers)
+def extract_stock_info(ticker, exchange):
+    base_url = "https://www.google.com/finance/quote/"
+    url = base_url + ticker + ":" + exchange
+    response = requests.get(url)
     soup = BeautifulSoup(response.content, "lxml")
 
     price_div = soup.find("div", attrs={"data-last-price": True})
@@ -31,26 +69,26 @@ def extract_stock_info(headers, base_url, stock_ticker, stock_exchange):
 
     price_in_usd = price
     if currency != "USD":
-        exchange_rate = convert_to_usd(headers, base_url, currency)
+        exchange_rate = convert_to_usd(currency)
         price_in_usd = round(price * exchange_rate, 2)
 
     return {
-        "Ticker": stock_ticker,
-        "Exchange": stock_exchange,
-        "Price": price_in_usd,
-        "Currency": currency,
+        "ticker": ticker,
+        "exchange": exchange,
+        "price": price,
+        "currency": currency,
+        "price_in_usd": price_in_usd
     }
-
-
-def main():
-    base_url = "https://www.google.com/finance/quote/"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
-    }
-
-    print(extract_stock_info(headers, base_url, "TSLA", "NASDAQ"))
-    print(extract_stock_info(headers, base_url, "SHOP", "TSE"))
 
 
 if __name__ == "__main__":
-    main()
+    # print(extract_stock_info("TSLA", "NASDAQ"))
+    # print(extract_stock_info("SHOP", "TSE"))
+    # print(Stock("TSLA", "NASDAQ"))
+
+    shop = Stock("SHOP", "TSE")
+    msft = Stock("MSFT", "NASDAQ")
+    tsla = Stock("TSLA", "NASDAQ")
+    portfolio = Portfolio([Position(shop, 10), Position(msft, 5), Position(tsla, 20)])
+
+    print(portfolio.portfolio_value())
