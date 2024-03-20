@@ -8,6 +8,7 @@
 import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
+from tabulate import tabulate
 
 
 @dataclass
@@ -44,7 +45,6 @@ class Portfolio:
         return total_value
 
 
-
 def convert_to_usd(currency):
     base_url = "https://www.google.com/finance/quote/"
     url = f"{base_url}{currency}-USD"
@@ -77,18 +77,66 @@ def extract_stock_info(ticker, exchange):
         "exchange": exchange,
         "price": price,
         "currency": currency,
-        "price_in_usd": price_in_usd
+        "price_in_usd": price_in_usd,
     }
 
 
-if __name__ == "__main__":
-    # print(extract_stock_info("TSLA", "NASDAQ"))
-    # print(extract_stock_info("SHOP", "TSE"))
-    # print(Stock("TSLA", "NASDAQ"))
+def portfolio_display(portfolio):
+    if not isinstance(portfolio, Portfolio):
+        raise TypeError("portfolio should be of type Portfolio")
 
+    portfolio_value = portfolio.portfolio_value()
+    position_data = []
+
+    print("\nPortfolio Positions:")
+
+    for position in portfolio.positions:
+        position_value = position.quantity * position.stock.price_in_usd
+        position_percent = (position_value / portfolio_value) * 100
+        position_data.append(
+            [
+                position.stock.ticker,
+                position.stock.exchange,
+                position.quantity,
+                position.stock.price_in_usd,
+                position_value,
+                position_percent,
+            ]
+        )
+
+        position_data = sorted(
+            position_data,
+            key=lambda x: x[4],
+            reverse=True,
+        )
+
+    table_headers = [
+        "Ticker",
+        "Exchange",
+        "Quantity",
+        "Price (USD)",
+        "Value (USD)",
+        "%",
+    ]
+
+    print(
+        tabulate(
+            position_data,
+            table_headers,
+            tablefmt="fancy_grid",
+            floatfmt=".2f",
+        )
+    )
+
+    print(f"TotalPortfolio Value: ${portfolio_value:,.2f}\n")
+
+
+if __name__ == "__main__":
     shop = Stock("SHOP", "TSE")
     msft = Stock("MSFT", "NASDAQ")
     tsla = Stock("TSLA", "NASDAQ")
-    portfolio = Portfolio([Position(shop, 10), Position(msft, 5), Position(tsla, 20)])
+    googl = Stock("GOOGL", "NASDAQ")
 
-    print(portfolio.portfolio_value())
+    portfolio = Portfolio([Position(shop, 50), Position(msft, 15), Position(tsla, 100), Position(googl, 50)])
+
+    portfolio_display(portfolio)
