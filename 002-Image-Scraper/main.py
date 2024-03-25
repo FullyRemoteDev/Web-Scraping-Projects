@@ -34,12 +34,21 @@ def get_img_nodes(keyword=None, limit=10):
     return imgs
 
 
+def img_urls_filter(img_urls, no_list):
+    filtered_urls = []
+    for url in img_urls:
+        if not any(word in url for word in no_list):
+            filtered_urls.append(url)
+
+    return filtered_urls
+
+
 if __name__ == "__main__":
     img_nodes = get_img_nodes(keyword="water")
     img_urls = [i.attrs["src"] for i in img_nodes]
-
-    for url in img_urls:
-        print(url)
-
-    print(len(img_nodes))
     print(len(img_urls))
+
+    no_list = ["plus", "premium", "profile"]
+    filtered_urls = img_urls_filter(img_urls, no_list)
+    print(len(filtered_urls))
+    print(filtered_urls)
