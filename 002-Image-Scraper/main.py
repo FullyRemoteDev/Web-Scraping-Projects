@@ -15,6 +15,13 @@
 from httpx import get
 from selectolax.parser import HTMLParser
 import os
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+
 
 # gets all the image tag nodes in the page
 def get_img_nodes(keyword=None, limit=10):
@@ -50,7 +57,7 @@ def img_urls_filter(img_urls, no_list):
 def save_images(img_urls, save_folder="images", tag=""):
     for url in img_urls:
         response = get(url)
-    
+        logging.info(f"Downloading {url}")
         file_name = url.split("/")[-1]
 
         if not os.path.exists(save_folder):
@@ -58,17 +65,16 @@ def save_images(img_urls, save_folder="images", tag=""):
 
         with open(f"{save_folder}/{tag}_{file_name}.jpg", "wb") as f:
             f.write(response.content)
+            logging.info(f"Saved {file_name}, size: {round(len(response.content) / 1024 / 1024, 2)} MB.")
 
 
 if __name__ == "__main__":
-    img_nodes = get_img_nodes(keyword="water")
-    print(len(img_nodes))
+    search_keyword = "water"
 
+    img_nodes = get_img_nodes(keyword=search_keyword)
     img_urls = [i.attrs["src"] for i in img_nodes]
-    print(len(img_urls))
 
     no_list = ["plus", "premium", "profile"]
     filtered_urls = img_urls_filter(img_urls, no_list)
-    print(len(filtered_urls))
 
-    save_images(img_urls=filtered_urls, save_folder="images", tag="water")
+    save_images(img_urls=filtered_urls[:3], save_folder="images", tag=search_keyword)
