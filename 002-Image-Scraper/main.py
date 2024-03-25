@@ -14,6 +14,7 @@
 
 from httpx import get
 from selectolax.parser import HTMLParser
+import os
 
 # gets all the image tag nodes in the page
 def get_img_nodes(keyword=None, limit=10):
@@ -45,6 +46,20 @@ def img_urls_filter(img_urls, no_list):
     return filtered_urls
 
 
+# download the images
+def save_images(img_urls, save_folder="images", tag=""):
+    for url in img_urls:
+        response = get(url)
+    
+        file_name = url.split("/")[-1]
+
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+
+        with open(f"{save_folder}/{tag}_{file_name}.jpg", "wb") as f:
+            f.write(response.content)
+
+
 if __name__ == "__main__":
     img_nodes = get_img_nodes(keyword="water")
     print(len(img_nodes))
@@ -55,4 +70,5 @@ if __name__ == "__main__":
     no_list = ["plus", "premium", "profile"]
     filtered_urls = img_urls_filter(img_urls, no_list)
     print(len(filtered_urls))
-    print(filtered_urls)
+
+    save_images(img_urls=filtered_urls, save_folder="images", tag="water")
