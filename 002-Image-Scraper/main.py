@@ -9,16 +9,27 @@
 #   - sample interface
 #       if __name__ == "__main__":
 #           scrape("water", 10)
-# 
+#
 
-import requests
+
+from httpx import get
 from selectolax.parser import HTMLParser
 
 
-def scrape(base_url, keyword, limit=10):
-    pass
+def get_img_tags(keyword, limit=10):
+    base_url = "https://unsplash.com/s/photos/"
+    url = f"{base_url}{keyword}?per_page={limit}"
+
+    response = get(url)
+
+    if response.status_code != 200:
+        raise Exception("Request failed with status code " + str(response.status_code))
+
+    tree = HTMLParser(response.text)
+    imgs = tree.css("figure a img + div img")
+
+    return imgs
 
 
 if __name__ == "__main__":
-    base_url = "https://unsplash.com/s/photos/"
-    scrape(base_url, "water")
+    print(get_img_tags("water"))
