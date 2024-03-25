@@ -15,7 +15,7 @@
 from httpx import get
 from selectolax.parser import HTMLParser
 
-
+# gets all the image tag nodes in the page
 def get_img_nodes(keyword=None, limit=10):
     if not keyword:
         raise Exception("Keyword is not given")
@@ -29,14 +29,16 @@ def get_img_nodes(keyword=None, limit=10):
         raise Exception("Request failed with status code " + str(response.status_code))
 
     tree = HTMLParser(response.text)
-    imgs = tree.css("figure a img + div img")
+    img_nodes = tree.css("figure a img + div img")
 
-    return imgs
+    return img_nodes
 
 
+# filter out premium, watermarked images
 def img_urls_filter(img_urls, no_list):
     filtered_urls = []
     for url in img_urls:
+        url = url.split("?")[0] # strip out the parameters after ?
         if not any(word in url for word in no_list):
             filtered_urls.append(url)
 
@@ -45,6 +47,8 @@ def img_urls_filter(img_urls, no_list):
 
 if __name__ == "__main__":
     img_nodes = get_img_nodes(keyword="water")
+    print(len(img_nodes))
+
     img_urls = [i.attrs["src"] for i in img_nodes]
     print(len(img_urls))
 
