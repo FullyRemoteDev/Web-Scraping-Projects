@@ -16,7 +16,10 @@ from httpx import get
 from selectolax.parser import HTMLParser
 
 
-def get_img_tags(keyword, limit=10):
+def get_img_nodes(keyword=None, limit=10):
+    if not keyword:
+        raise Exception("Keyword is not given")
+
     base_url = "https://unsplash.com/s/photos/"
     url = f"{base_url}{keyword}?per_page={limit}"
 
@@ -32,4 +35,11 @@ def get_img_tags(keyword, limit=10):
 
 
 if __name__ == "__main__":
-    print(get_img_tags("water"))
+    img_nodes = get_img_nodes(keyword="water")
+    img_urls = [i.attrs["src"] for i in img_nodes]
+
+    for url in img_urls:
+        print(url)
+
+    print(len(img_nodes))
+    print(len(img_urls))
