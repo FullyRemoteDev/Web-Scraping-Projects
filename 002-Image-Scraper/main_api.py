@@ -15,5 +15,14 @@
 from httpx import get
 
 
+def get_response_for(keyword, results_per_page):
+    base_url = "https://unsplash.com/napi/search/photos"
+    url = f"{base_url}?query={keyword}&per_page={results_per_page}"
+
+    response = get(url)
+    if response.status_code == 200:
+        return response.json()
+
+
 if __name__ == "__main__":
-    pass
+    print(get_response_for("water", 10))
