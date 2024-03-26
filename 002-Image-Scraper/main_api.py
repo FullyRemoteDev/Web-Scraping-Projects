@@ -13,11 +13,12 @@
 
 
 from httpx import get
+import os
 
 
-def get_response_for(keyword, results_per_page):
+def get_response_for(keyword, results_per_page, page=1):
     base_url = "https://unsplash.com/napi/search/photos"
-    url = f"{base_url}?query={keyword}&per_page={results_per_page}"
+    url = f"{base_url}?query={keyword}&per_page={results_per_page}&page={page}"
 
     response = get(url)
     if response.status_code == 200:
@@ -33,8 +34,44 @@ def get_image_urls(data):
     return img_urls
 
 
-if __name__ == "__main__":
-    data = get_response_for("water", 10)
+def download_images(img_urls, max_download, save_folder="images", keyword=""):
+    successfully_downloaded = 0
 
-    img_urls = get_image_urls(data)
-    print(img_urls)
+    for url in img_urls:
+        if successfully_downloaded < max_download:
+            response = get(url)
+            file_name = keyword + "_" + url.split("/")[-1]
+
+            if not os.path.exists(save_folder):
+                os.makedirs(save_folder)
+            
+            with open(f"{save_folder}/{file_name}.jpg", "wb") as f:
+                f.write(response.content)
+                successfully_downloaded += 1
+        else:
+            break
+
+    return successfully_downloaded
+
+
+def scrape(keyword, num_of_results):
+    start_page = 1
+    success_count = 0
+
+    while success_count < num_of_results:
+        data = get_response_for(keyword=keyword, results_per_page=20, page=start_page)
+
+        max_downloads = num_of_results - success_count
+
+        if data:
+            img_urls = get_image_urls(data)
+            success_downloads = download_images(img_urls, max_downloads, keyword=keyword)
+            success_count += success_downloads
+            start_page += 1
+        else:
+            print("Error: No data returned")
+            break
+        
+
+if __name__ == "__main__":
+    scrape("water", 10)
