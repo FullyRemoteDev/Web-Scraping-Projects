@@ -24,5 +24,17 @@ def get_response_for(keyword, results_per_page):
         return response.json()
 
 
+def get_image_urls(data):
+    results = data["results"]
+
+    full_img_urls = [x["urls"]["raw"] for x in results if x["premium"] is False]
+    img_urls = [x.split("?")[0] for x in full_img_urls]
+
+    return img_urls
+
+
 if __name__ == "__main__":
-    print(get_response_for("water", 10))
+    data = get_response_for("water", 10)
+
+    img_urls = get_image_urls(data)
+    print(img_urls)
