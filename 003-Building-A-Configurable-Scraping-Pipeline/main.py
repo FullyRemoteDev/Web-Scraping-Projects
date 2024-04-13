@@ -12,6 +12,7 @@
 # 			- discount %
 
 from playwright.sync_api import sync_playwright
+from selectolax.parser import HTMLParser
 
 url = "https://store.steampowered.com/specials/"
 
@@ -23,7 +24,23 @@ if __name__ == "__main__":
         
         page.wait_for_load_state("networkidle")
         page.evaluate("() => window.scrollTo(0, document.body.scrollHeight)")
+        page.wait_for_load_state("domcontentloaded")
+        page.wait_for_selector('div[class*="y9MSdld4zZCuoQpRVDgMm"]')
 
-        print(page.title())       
+        html = page.inner_html("body")
+        tree = HTMLParser(html)
 
+        divs = tree.css('div[class*="y9MSdld4zZCuoQpRVDgMm"]')
+        print(len(divs))
+
+        for div in divs:
+            title = div.css_first('div[class*="StoreSaleWidgetTitle"]').text()
+            thumbnail = div.css_first('div[class*="CapsuleImageCtn"] img').attributes.get("src")
+
+            attrs = {
+                "title": title,
+                "thumbnail": thumbnail,
+            }
+
+            print(attrs)
 
