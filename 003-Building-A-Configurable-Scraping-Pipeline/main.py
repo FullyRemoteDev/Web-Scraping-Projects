@@ -37,9 +37,13 @@ if __name__ == "__main__":
             title = div.css_first('div[class*="StoreSaleWidgetTitle"]').text()
             thumbnail = div.css_first('div[class*="CapsuleImageCtn"] img').attributes.get("src")
             tags = [tag.text() for tag in div.css('a[class*="WidgetTag"]')[:5]]
+            release_date = div.css_first('div[class*="_3eOdkTDYdWyo_U5-JPeer1"]').text()
+            reviewed_by = div.css_first('div[class*="_1Deyvnxud-VpRoj0-ak-WK"]').text()
 
             attrs = {
                 "title": title,
+                "reviewed_by": reviewed_by,
+                "release_date": release_date,
                 "tags": tags,
                 "thumbnail": thumbnail,
             }
