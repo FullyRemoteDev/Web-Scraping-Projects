@@ -36,9 +36,11 @@ if __name__ == "__main__":
         for div in divs:
             title = div.css_first('div[class*="StoreSaleWidgetTitle"]').text()
             thumbnail = div.css_first('div[class*="CapsuleImageCtn"] img').attributes.get("src")
+            tags = [tag.text() for tag in div.css('a[class*="WidgetTag"]')[:5]]
 
             attrs = {
                 "title": title,
+                "tags": tags,
                 "thumbnail": thumbnail,
             }
 
