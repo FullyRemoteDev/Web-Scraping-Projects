@@ -12,6 +12,7 @@
 # 			- discount %
 
 from utils.extract import extract_full_body_html
+from utils.parse import parse_raw_attributes
 from config.tools import load_config
 from selectolax.parser import HTMLParser
 
@@ -25,31 +26,31 @@ if __name__ == "__main__":
     )
 
     tree = HTMLParser(html)
-
     divs = tree.css(config.get("container").get("selector"))
     print(len(divs))
 
     for div in divs:
-        title = div.css_first('div[class*="StoreSaleWidgetTitle"]').text()
-        thumbnail = div.css_first('div[class*="CapsuleImageCtn"] img').attributes.get("src")
-        tags = [tag.text() for tag in div.css('a[class*="WidgetTag"]')[:5]]
-        release_date = div.css_first('div[class*="_3eOdkTDYdWyo_U5-JPeer1"]').text()
-        review_score = div.css_first('a[class*="ReviewScore"] div div').text()
-        reviewed_by = div.css_first('div[class*="_1Deyvnxud-VpRoj0-ak-WK"]').text()
+        attrs = parse_raw_attributes(div, config.get("item"))
+        # title = div.css_first('div[class*="StoreSaleWidgetTitle"]').text()
+        # thumbnail = div.css_first('div[class*="CapsuleImageCtn"] img').attributes.get("src")
+        # tags = [tag.text() for tag in div.css('a[class*="WidgetTag"]')[:5]]
+        # release_date = div.css_first('div[class*="_3eOdkTDYdWyo_U5-JPeer1"]').text()
+        # review_score = div.css_first('a[class*="ReviewScore"] div div').text()
+        # reviewed_by = div.css_first('div[class*="_1Deyvnxud-VpRoj0-ak-WK"]').text()
         
-        sale_price = div.css_first('div[class*="Wh0L8EnwsPV_8VAu8TOYr"]').text()
-        original_price = div.css_first('div[class*="_1EKGZBnKFWOr3RqVdnLMRN"]').text()
+        # sale_price = div.css_first('div[class*="Wh0L8EnwsPV_8VAu8TOYr"]').text()
+        # original_price = div.css_first('div[class*="_1EKGZBnKFWOr3RqVdnLMRN"]').text()
 
 
-        attrs = {
-            "title": title,
-            "original_price": original_price,
-            "sale_price": sale_price,
-            "review_score": review_score,   
-            "reviewed_by": reviewed_by,
-            "release_date": release_date,
-            "tags": tags,
-            "thumbnail": thumbnail,
-        }
+        # attrs = {
+        #     "title": title,
+        #     "original_price": original_price,
+        #     "sale_price": sale_price,
+        #     "review_score": review_score,   
+        #     "reviewed_by": reviewed_by,
+        #     "release_date": release_date,
+        #     "tags": tags,
+        #     "thumbnail": thumbnail,
+        # }
 
         print(attrs)

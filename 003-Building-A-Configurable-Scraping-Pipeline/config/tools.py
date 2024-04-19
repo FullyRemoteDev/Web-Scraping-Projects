@@ -9,14 +9,14 @@ _config = {
         "match": "all",
         "type": "node",
     },
-    "items": [
+    "item": [
         {
             "name": "title",
-            "selector": "div[class*='y9MSdld4zZCuoQpRVDgMm']",
+            "selector": "div[class*='StoreSaleWidgetTitle']",
             "match": "first",
             "type": "text",
         }
-    ]
+    ],
 }
 
 
