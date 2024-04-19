@@ -12,19 +12,21 @@
 # 			- discount %
 
 from utils.extract import extract_full_body_html
+from config.tools import load_config
 from selectolax.parser import HTMLParser
 
-url = "https://store.steampowered.com/specials/"
 
 if __name__ == "__main__":
+    config = load_config()
+
     html = extract_full_body_html(
-        from_url=url,
-        wait_for='div[class*="y9MSdld4zZCuoQpRVDgMm"]'
+        from_url=config.get("url"),
+        wait_for=config.get("container").get("selector")
     )
 
     tree = HTMLParser(html)
 
-    divs = tree.css('div[class*="y9MSdld4zZCuoQpRVDgMm"]')
+    divs = tree.css(config.get("container").get("selector"))
     print(len(divs))
 
     for div in divs:
