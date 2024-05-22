@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
         # thumbnail -> attr.src
         # tags -> first 5 from list
-        # release_date -> reformatted to yyy-mm-dd
+        # release_date -> reformatted to yyyy-mm-dd
         # reviewed_by -> extract digits only
         # price_currency -> split by space, get first
         # sale_price -> split by space, get second     
