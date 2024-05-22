@@ -20,8 +20,18 @@ def reformat_date(date_raw: str, input_format: str = '%b %d, %Y', output_format:
     return dt_fmt
 
 
-def regex(input_str: str, pattern: str):
-    return re.findall(pattern, input_str)
+def regex(input_str: str, pattern: str, do_what: str = "findall"):
+    if do_what == "findall":
+        return re.findall(pattern, input_str)
+    else:
+        raise ValueError("The function expects 'findall' or 'split' to be provided.")
+
+
+def split(input_str: str, select_what: str = "price"):
+    if select_what == "currency":
+        return input_str[0]
+    elif select_what == "price":
+        return input_str[1:]
 
 
 def format_and_transform(attrs: dict):
@@ -29,7 +39,10 @@ def format_and_transform(attrs: dict):
         "thumbnail": lambda n: get_attrs_from_node(n, "src"),
         "tags": lambda input_list: get_first_n(input_list, 5),
         "release_date": lambda date: reformat_date(date, '%b %d, %Y', '%Y-%m-%d'),
-        "reviewed_by": lambda raw: int(''.join(regex(raw, r'\d+')))
+        "reviewed_by": lambda raw: int(''.join(regex(raw, r'\d+', "findall"))),
+        "price_currency": lambda raw: split(raw, "currency"),
+        "sale_price": lambda raw: float(split(raw, "price").replace(",", "")),
+        "original_price": lambda raw: float(split(raw, "price").replace(",", ""))
     }
 
     for k, v in transforms.items():
