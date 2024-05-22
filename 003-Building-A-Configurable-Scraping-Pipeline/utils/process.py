@@ -1,4 +1,5 @@
 import re
+import pandas as pd
 from datetime import datetime
 from selectolax.parser import Node
 
@@ -51,3 +52,11 @@ def format_and_transform(attrs: dict):
             
     return attrs
 
+
+def save_to_file(filename="extract", data: list[dict] = None):
+    if data is None:
+        raise ValueError("The function expects data to be provided as a list of dictionaries.")
+    
+    df = pd.DataFrame(data)
+    filename = f"{datetime.now().strftime('%Y_%m_%d')}_{filename}.csv"
+    df.to_csv(filename, encoding='utf-8', index=False)
