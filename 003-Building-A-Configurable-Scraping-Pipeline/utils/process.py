@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from selectolax.parser import Node
 
@@ -19,11 +20,16 @@ def reformat_date(date_raw: str, input_format: str = '%b %d, %Y', output_format:
     return dt_fmt
 
 
+def regex(input_str: str, pattern: str):
+    return re.findall(pattern, input_str)
+
+
 def format_and_transform(attrs: dict):
     transforms = {
         "thumbnail": lambda n: get_attrs_from_node(n, "src"),
         "tags": lambda input_list: get_first_n(input_list, 5),
-        "release_date": lambda date: reformat_date(date, '%b %d, %Y', '%Y-%m-%d')
+        "release_date": lambda date: reformat_date(date, '%b %d, %Y', '%Y-%m-%d'),
+        "reviewed_by": lambda raw: int(''.join(regex(raw, r'\d+')))
     }
 
     for k, v in transforms.items():
