@@ -26,13 +26,15 @@ if __name__ == "__main__":
         wait_for=config.get("container").get("selector")
     )
 
-    tree = HTMLParser(html)
-    divs = tree.css(config.get("container").get("selector"))
-    print(len(divs))
+    nodes = parse_raw_attributes(html, [config.get('container')])
+
+    # tree = HTMLParser(html)
+    # divs = tree.css(config.get("container").get("selector"))
+    # print(len(divs))
 
     game_data = []
-    for div in divs:
-        attrs = parse_raw_attributes(div, config.get("item"))
+    for node in nodes.get('store_sale_divs'):
+        attrs = parse_raw_attributes(node, config.get("item"))
         attrs = format_and_transform(attrs)
         game_data.append(attrs)
         

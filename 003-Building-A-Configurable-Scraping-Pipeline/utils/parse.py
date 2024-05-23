@@ -1,7 +1,11 @@
-from selectolax.parser import Node
+from typing import Union
+from selectolax.parser import Node, HTMLParser
 
 
-def parse_raw_attributes(node: Node, selectors: list):
+def parse_raw_attributes(node: Union[Node, str], selectors: list[dict]) -> dict:
+    if not issubclass(Node, type(node)):
+        node = HTMLParser(node)
+
     parsed = {}
 
     for s in selectors:
