@@ -15,7 +15,6 @@ from utils.extract import extract_full_body_html
 from utils.parse import parse_raw_attributes
 from utils.process import format_and_transform, save_to_file
 from config.tools import load_config
-from selectolax.parser import HTMLParser
 
 
 if __name__ == "__main__":
@@ -27,10 +26,6 @@ if __name__ == "__main__":
     )
 
     nodes = parse_raw_attributes(html, [config.get('container')])
-
-    # tree = HTMLParser(html)
-    # divs = tree.css(config.get("container").get("selector"))
-    # print(len(divs))
 
     game_data = []
     for node in nodes.get('store_sale_divs'):
